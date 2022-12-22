@@ -1,4 +1,5 @@
 #coding=windows-1251
+import pandas
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -86,8 +87,16 @@ u1 = w1 = v1 = 1
 u2 = w2 = v2 = 1
 h = 0.1
 j = h
-_VARS = {'window': False} #--------------------------------------------- Сюда все варики и ивенты пишем
-layout = [                #--------------------------------------------- Здесь расстановка кнопок
+_VARS = {'window': False,       #--------------------------------------------- Сюда все варики и ивенты пишем
+         'table': False
+         }
+
+headers = {'i':[], 'xi':[], 'v(1)i':[], 'v(2)i':[], 'w(1)i':[], 'w(2)i':[], 'u(1)i-w(1)i':[], 'u(2)i-w(2)i':[], 'OLP':[], 'h':[], 'c1':[], 'c2':[]}
+headings = list(headers)
+table = pandas.DataFrame(columns=headers)
+values = table.values.tolist()
+
+layout = [                #--------------------------------------------- Здесь расстановка кнопок и прочего
           [gui.Text('Enter h:')],
           [gui.Input(key='h')],
           [gui.Text('Enter e:')],
@@ -96,7 +105,8 @@ layout = [                #--------------------------------------------- Здесь р
           [gui.Input(key='hop_count')],
           [gui.Exit('Exit')],
           [gui.Submit('Enter')],
-          [gui.Canvas(key='figCanvas')]
+          [gui.Canvas(key='figCanvas')],
+          [gui.Table(values = values, headings = headings, key='Table', expand_y=True, auto_size_columns=False, col_widths=list(map(lambda x:len(x)+1, headings)))]
 ]
 e = 0.01
 xO = []
@@ -112,7 +122,6 @@ i = 0
 # Само окно: |
 #            V
 _VARS['window'] = gui.Window('First', layout, resizable=True, finalize=True)
-
 # Нужно для рисунка в программе
 def draw_figure(canvas, figure):
     figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
@@ -120,6 +129,7 @@ def draw_figure(canvas, figure):
     figure_canvas_agg.get_tk_widget().pack(side='right', expand=-2)
     return figure_canvas_agg
 #
+#def draw_table(canvas, table):
 
 # Main loop, здесь основной движ
 # |||||||||
@@ -130,16 +140,20 @@ while True:
         h = float(values['h'])
         e = float(values['e'])
         n = int(values['hop_count'])
+
         while i < n and i < maxN:
             x, u1, u2 = rk4ForSyst(x, u1, u2, h)
             x1, w1, w2 = rk4ForSystWithDblHop(x1, w1, w2, h)
             x2,v1,v2,j = rk4ForSystWithCorrectHop(x2,v1,v2,h)
-            print(i,") ","(xi:",x," v(1)i:",u1," v(2)i:",u2," w(1)i", w1," w(2)i", w2," u(1)i-w(1)i:", u1-w1," u(2)i-w(2)i:",u2-w2,"OLP: ",lec(w2,v2),"h:",j,"c1: ",c1,"c2: ",c2,")")
+            table.loc[i] = [i, x, u1, u2, w1, w2, (u1-w1), (u2-w2), lec(w2, v2), j, c1, c2]  #---------------- Вставляем ряды со значениями в таблицу
             xO.append(x)
             yO.append(u1)
             zO.append(u2)
             i+=1
 
+        Values = table.values.tolist() #--------------------------------------------------------------------Так как таблица создана с помощью библиотеки Pandas, нужно извлечь из нее значения
+        gui.Table.update(gui.Window.find_element(_VARS['window'], 'Table'), Values) #-----------------------Подставляем значения в таблицу
+        gui.Window.refresh(_VARS['window']) #---------------------------------------------------------------Обновляем окно, чтобы в таблице отобразились данные
         fig1 = plt.figure()
         plt.subplot(1,3,1)
         plt.plot(xO,yO,'r') # x, u ось
@@ -151,12 +165,7 @@ while True:
         fig3 = plt.figure()
         plt.subplot(1,3,3)
         plt.plot(yO,zO,'r') # фазовое пространство
-        plt.legend('Phase space')
-
-        #fig1.set_label('')
-        #fig2.set_label('')
-        #fig3.set_label('')
-
+        plt.legend(['Phase space'])
         draw_figure(_VARS['window']['figCanvas'].TKCanvas, fig1)           #   <---
         draw_figure(_VARS['window']['figCanvas'].TKCanvas, fig2)           #   <---  Рисунок
         draw_figure(_VARS['window']['figCanvas'].TKCanvas, fig3)           #   <---
