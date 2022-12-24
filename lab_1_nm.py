@@ -9,4 +9,4 @@ layout = [[gui.Text('Первая лаба, выбираем задачку:')],
 window = gui.Window('Lab_One.exe', layout)
 event, values = window.read()
 if event == 'Первая':
-    exec(open("RK.py").read())
+    exec(open("OpenLab.py.py").read())
