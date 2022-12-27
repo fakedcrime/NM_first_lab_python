@@ -27,7 +27,7 @@ while True:
     if event == 'Вторая':
         #exec(open("Lab_1_NM_second_task.py").read())
         import Lab_1_NM_second_task
-        imp.reload((NMfirstLab1))
+        imp.reload((Lab_1_NM_second_task))
         #gui.Window.read(_VARS['window'])
     if event == gui.WIN_CLOSED or event == 'Выход':
         break
