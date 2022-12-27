@@ -1,3 +1,4 @@
+#coding=windows-1251
 import numpy as np
 from tabulate import tabulate
 import matplotlib.pyplot as plt

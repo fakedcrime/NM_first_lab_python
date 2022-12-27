@@ -1,3 +1,4 @@
+#coding=windows-1251
 import matplotlib.pyplot as plt
 import math
 from tabulate import tabulate
@@ -5,7 +6,11 @@ import numpy as np
 import PySimpleGUI as gui
 import pandas
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
+x0 = 0
+u0 = 1
+h = 0.001
+n = 30
+eps = 0.00000001
 def f(x, u):
     du = ((x / (1 + x ** 2)) * u ** 2) + u - (u ** 3) * math.sin(10 * x)
     return du
@@ -15,28 +20,17 @@ def Test(x, u):
     return u
 
 text = ""
-'''
-print("Input x0 count:")
-x0 = float(input())
-print("Input u0 count:")
-u0 = float(input())
-print("Input step count:")
-h = float(input())
-print("Input n count:")
-n = int(input())
-print("Input eps count:")
-eps = float(input())
-'''
 
-metod = 2  # Ð¼ÐµÑ‚Ð¾Ð´ Ð´Ð»Ñ Ð¾ÑÐ½Ð¾Ð²Ð½Ð¾Ð¹ Ð·Ð°Ð´Ð°Ñ‡Ð¸
-metodTest = 2  # Ð¼ÐµÑ‚Ð¾Ð´ Ð´Ð»Ñ Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ð¹ Ð·Ð°Ð´Ð°Ñ‡Ð¸
+
+metod = 2  # ìåòîä äëÿ îñíîâíîé çàäà÷è
+metodTest = 2  # ìåòîä äëÿ òåñòîâîé çàäà÷è
 b = 2
 
 Table = [["i", "x", "v", "   v2   ", "  v1-v2 ", "   S   ", "h", "C1", "C2"]]
 TabetTest = [["i", "x", "v", "   v2   ", "  v1-v2 ", "   S   ", "h", "C1", "C2", "u", "u-v"]]
 
 
-# Ð¼ÐµÑ‚Ð¾Ð´ Ð´Ð»Ñ Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ð¹ Ñ„ÑƒÐ½ÑƒÑ†Ð¸Ð¸ Ñ Ð¿Ð¾ÑÑ‚Ð¾ÑÐ½Ð½Ñ‹Ð¼ ÑˆÐ°Ð³Ð¾Ð¼
+# ìåòîä äëÿ òåñòîâîé ôóíóöèè ñ ïîñòîÿííûì øàãîì
 def RungeKutt4Test(x1, v1, h, n, eps, b):
     i = 0
     v = [v1]
@@ -70,7 +64,7 @@ def RungeKutt4Test(x1, v1, h, n, eps, b):
     return x, v, U, TabetTest, maxL
 
 
-# Ð¼ÐµÑ‚Ð¾Ð´ Ñ Ð¿Ð¾ÑÑ‚Ð¾ÑÐ½Ð½Ñ‹Ð¼ ÑˆÐ°Ð³Ð¾Ð¼
+# ìåòîä ñ ïîñòîÿííûì øàãîì
 def RungeKutt4(x1, v1, h, n, eps, b):
     i = 0
     v = [v1]
@@ -102,7 +96,7 @@ def RungeKutt4(x1, v1, h, n, eps, b):
     return x, v, Table, maxL
 
 
-# Ð¼ÐµÑ‚Ð¾Ð´ Ð´Ð»Ñ Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ð¹ Ñ„ÑƒÐ½ÑƒÑ†Ð¸Ð¸ Ñ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ñ‹Ð¼ ÑˆÐ°Ð³Ð¾Ð¼
+# ìåòîä äëÿ òåñòîâîé ôóíóöèè ñ ïåðåìåííûì øàãîì
 def RungeKutt4hTest(x1, v1, h, n, eps, b):
     i = 0
     v = [v1]
@@ -165,7 +159,7 @@ def RungeKutt4hTest(x1, v1, h, n, eps, b):
     return x, v, U, TabetTest, maxL, q1, q2
 
 
-# Ð¼ÐµÑ‚Ð¾Ð´ Ñ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ñ‹Ð¼ ÑˆÐ°Ð³Ð¾Ð¼
+# ìåòîä ñ ïåðåìåííûì øàãîì
 def RungeKutt4h(x1, v1, h, n, eps, b):
     i = 0
     v = [v1]
@@ -226,7 +220,7 @@ def RungeKutt4h(x1, v1, h, n, eps, b):
     return x, v, Table, maxL, q1, q2
 
 
-def reference(metod, x, b, maxL, q1, q2):  # Ð¡Ð¿Ñ€Ð°Ð²ÐºÐ°
+def reference(metod, x, b, maxL, q1, q2):  # Ñïðàâêà
     if metod == 1:
         T = [0, 1]
         T[0] = "n=", len(x) - 1
@@ -261,7 +255,7 @@ def halfh(xi, vi, h):
     return xi, vi
 
 
-def halfh_v2(xi, vi, h):  # ÐŸÐ¾Ð»Ð¾Ð²Ð¸Ð½Ð½Ñ‹Ð¹ ÑˆÐ°Ð³
+def halfh_v2(xi, vi, h):  # Ïîëîâèííûé øàã
     x = [xi]
     v = [vi]
 
@@ -276,7 +270,7 @@ def halfh_v2(xi, vi, h):  # ÐŸÐ¾Ð»Ð¾Ð²Ð¸Ð½Ð½Ñ‹Ð¹ ÑˆÐ°Ð³
     return x, v
 
 
-def halfh_v2Test(xi, vi, h):  # ÐŸÐ¾Ð»Ð¾Ð²Ð¸Ð½Ð½Ñ‹Ð¹ ÑˆÐ°Ð³ Ð´Ð»Ñ Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ð¹ Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¸
+def halfh_v2Test(xi, vi, h):  # Ïîëîâèííûé øàã äëÿ òåñòîâîé ôóíêöèè
     x = [xi]
     v = [vi]
 
@@ -324,18 +318,13 @@ def draw_figure(canvas, figure):
     return figure_canvas_agg
 while True:
     event, values = _VARS['window'].read()
-    #x0 = 0
-    #u0 = 1
-    #h = 0.001
-    #n = 30
-    #eps = 0.00000001
-    x0 = float(values['x0'])
-    u0 = float(values['u0'])
-    h = float(values['h'])
-    n = int(values['n'])
-    eps = float(values['eps'])
     if event == 'Enter':
-        if metodTest == 1:  # Ð²Ñ‹Ð·Ð¾Ð² Ð¼ÐµÑ‚Ð¾Ð´Ð° Ð´Ð»Ñ Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ð¹ Ñ„ÑƒÐ½ÑƒÑ†Ð¸Ð¸ Ñ Ð¿Ð¾ÑÑ‚Ð¾ÑÐ½Ð½Ñ‹Ð¼ ÑˆÐ°Ð³Ð¾Ð¼
+        u0 = float(values['u0'])
+        x0 = float(values['x0'])
+        h = float(values['h'])
+        n = int(values['n'])
+        eps = float(values['eps'])
+        if metodTest == 1:  # âûçîâ ìåòîäà äëÿ òåñòîâîé ôóíóöèè ñ ïîñòîÿííûì øàãîì
 
             x, v, u, Table1, maxL = RungeKutt4Test(x0, u0, h, n, eps, b)
             fig1 = plt.figure()
@@ -343,7 +332,7 @@ while True:
             plt.plot(x, v, "g-")
             # plt.show()
             plt.plot(x, u, "y-")
-            plt.title("Ð§Ð¸ÑÐ»ÐµÐ½Ð½Ð¾Ðµ Ñ€ÐµÑˆÐµÐ½Ð¸Ðµ Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ð¹ Ð·Ð°Ð´Ð°Ñ‡Ð¸")
+            plt.title("×èñëåííîå ðåøåíèå òåñòîâîé çàäà÷è")
             draw_figure(_VARS['window']['figCanvas'].TKCanvas, fig1)
             i = 0
             while len(Table1) > i:
@@ -357,7 +346,7 @@ while True:
             del Table1[0]
             gui.Table.update(gui.Window.find_element(_VARS['window'], 'Table'), Table1)
             gui.Window.refresh(_VARS['window'])
-        elif metodTest == 2:  # Ð²Ñ‹Ð·Ð¾Ð² Ð¼ÐµÑ‚Ð¾Ð´Ð° Ð´Ð»Ñ Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ð¹ Ñ„ÑƒÐ½ÑƒÑ†Ð¸Ð¸ Ñ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ñ‹Ð¼ ÑˆÐ°Ð³Ð¾Ð¼
+        elif metodTest == 2:  # âûçîâ ìåòîäà äëÿ òåñòîâîé ôóíóöèè ñ ïåðåìåííûì øàãîì
 
             x, v, u, Table1, maxL, q1, q2 = RungeKutt4hTest(x0, u0, h, n, eps, b)
             fig2 = plt.figure()
@@ -365,7 +354,7 @@ while True:
             plt.plot(x, v, "g-")
             # plt.show()
             plt.plot(x, u, "y-")
-            plt.title("Ð§Ð¸ÑÐ»ÐµÐ½Ð½Ð¾Ðµ Ñ€ÐµÑˆÐµÐ½Ð¸Ðµ Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ð¹ Ð·Ð°Ð´Ð°Ñ‡Ð¸")
+            plt.title("×èñëåííîå ðåøåíèå òåñòîâîé çàäà÷è")
             draw_figure(_VARS['window']['figCanvas'].TKCanvas, fig2)
             i = 0
             while len(Table1) > i:
@@ -378,12 +367,12 @@ while True:
             del Table1[0]
             gui.Table.update(gui.Window.find_element(_VARS['window'], 'Table'), Table1)
             gui.Window.refresh(_VARS['window'])
-        if metod == 1:  # Ð²Ñ‹Ð·Ð¾Ð² Ð¼ÐµÑ‚Ð¾Ð´Ð° Ñ Ð¿Ð¾ÑÑ‚Ð¾ÑÐ½Ð½Ñ‹Ð¼ ÑˆÐ°Ð³Ð¾Ð¼
+        if metod == 1:  # âûçîâ ìåòîäà ñ ïîñòîÿííûì øàãîì
             plt.subplot()
             fig3 = plt.figure()
             x, v, Table, maxL = RungeKutt4(x0, u0, h, n, eps, b)
             plt.plot(x, v, "y-")
-            plt.title("Ð§Ð¸ÑÐ»ÐµÐ½Ð½Ð¾Ðµ Ñ€ÐµÑˆÐµÐ½Ð¸Ðµ Ð¾ÑÐ½Ð¾Ð²Ð½Ð¾Ð¹ Ð·Ð°Ð´Ð°Ñ‡Ð¸")
+            plt.title("×èñëåííîå ðåøåíèå îñíîâíîé çàäà÷è")
             draw_figure(_VARS['window']['figCanvas'].TKCanvas, fig3)
             i = 0
             while len(Table) > i:
@@ -397,12 +386,12 @@ while True:
             del Table[0]
             gui.Table.update(gui.Window.find_element(_VARS['window'], 'Table1'), Table)
             gui.Window.refresh(_VARS['window'])
-        elif metod == 2:  # Ð²Ñ‹Ð·Ð¾Ð² Ð¼ÐµÑ‚Ð¾Ð´Ð° Ñ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ñ‹Ð¼ ÑˆÐ°Ð³Ð¾Ð¼
+        elif metod == 2:  # âûçîâ ìåòîäà ñ ïåðåìåííûì øàãîì
             plt.subplot()
             fig4 = plt.figure()
             x, v, Table, maxL, q1, q2 = RungeKutt4h(x0, u0, h, n, eps, b)
             plt.plot(x, v, "g-")
-            plt.title("Ð§Ð¸ÑÐ»ÐµÐ½Ð½Ð¾Ðµ Ñ€ÐµÑˆÐµÐ½Ð¸Ðµ Ð¾ÑÐ½Ð¾Ð²Ð½Ð¾Ð¹ Ð·Ð°Ð´Ð°Ñ‡Ð¸")
+            plt.title("×èñëåííîå ðåøåíèå îñíîâíîé çàäà÷è")
             draw_figure(_VARS['window']['figCanvas'].TKCanvas, fig4)
             i = 0
             while len(Table) > i:
